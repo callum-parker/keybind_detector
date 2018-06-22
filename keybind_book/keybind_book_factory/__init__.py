@@ -10,7 +10,6 @@ class Keybind_book_factory:
 	
 	@staticmethod
 	def create_keybind_book(keybind_data_array):
-		# check data signature is correct
 	
 		keybind_book = []
 		
@@ -19,11 +18,15 @@ class Keybind_book_factory:
 			keybind_book.append(new_record)
 			
 		# check new data structure is correct
+		assert(Keybind_book_factory.is_valid_book(keybind_book))
 		
 		return keybind_book
 	
 	@staticmethod
 	def record(record_data):
+		# reject records with an incorrect number of elements
+		assert(len(record_data) == 3)
+		
 		new_record = {}
 		
 		new_record["key_combination"] = Keybind_book_factory.key_combination(record_data[0])
@@ -36,6 +39,9 @@ class Keybind_book_factory:
 	
 	@staticmethod
 	def key_combination(key_combination_data):
+		# reject records with no keys to trigger them
+		assert(len(key_combination_data) > 0)
+		
 		new_key_combination = set()
 		
 		for key_data in key_combination_data:
@@ -78,6 +84,17 @@ class Keybind_book_factory:
 	# type checking static methods
 	
 	@staticmethod
+	def is_valid_book(book):
+		correct = True
+		for record in book:
+			correct = Keybind_book_factory.is_valid_record(record)
+			
+			if not correct:
+				return False
+			
+		return True
+	
+	@staticmethod
 	def is_valid_record(record):
 		#record is valid
 		if not type(record) is dict:
@@ -117,7 +134,7 @@ class Keybind_book_factory:
 	
 	@staticmethod
 	def is_valid_keycombination(key_combination):
-		if not type(key_combination) is set:
+		if not type(key_combination) is set or len(key_combination) < 1:
 			return False
 		else:
 			for element in key_combination:
@@ -125,12 +142,3 @@ class Keybind_book_factory:
 				if not(type(element) is keyboard.Key or type(element) is keyboard.KeyCode):
 					return False
 			return True
-	
-if __name__ == "__main__":
-	data = [ [("ctrl", "a"), "meme", [123, 456]], [("ctrl", "a"), "meme", [123, 456]] ]
-	# i should confirm this output is valid with assert
-	returned_data = Keybind_book_factory.create_keybind_book(data)
-	for record in returned_data:
-		assert(Keybind_book_factory.is_valid_record(record))
-	print(data)
-	print(returned_data)

@@ -29,15 +29,24 @@ class Keybind_book:
 		self.add(new_record)
 	
 	def add(self, keybind):
-		Keybind_book_factory.is_valid_record(keybind)
+		assert(self.is_keybinding(keybind))
 		self.keybindings.append(keybind)
 		
 	def add_and_save(self, keybind):
 		self.add(keybind)
 		self.save()
 	
-	def delete(self, keybind):
-		self.keybindings.remove(keybind)
+	def delete(self, record):
+		# confirm the keybind record is valid
+		assert(self.is_keybinding(record))
+		
+		# confirm the data structure contains the record
+		matches = self.lookup(record["key_combination"])
+		assert(len(matches) > 0)
+		assert(record in matches)
+		
+		# delete the record
+		self.keybindings.remove(record)
 	
 	# persistent object state management methods
 	
@@ -50,16 +59,3 @@ class Keybind_book:
 	@classmethod
 	def is_keybinding(cls, keybinding_record):
 		return Keybind_book_factory.is_valid_record(keybinding_record)
-
-if __name__ == "__main__":
-	book = Keybind_book("./testdata.pickle")
-	book.save()
-	book.load()
-	
-	new_record_data = [("ctrl", "a"), "meme", [123, 456]]
-	new_record = Keybind_book_factory.record(new_record_data)
-	
-	book.add_and_save(new_record)
-	assert(book.lookup(new_record["key_combination"]) == [new_record])
-	book.load()
-	assert(book.lookup(new_record["key_combination"]) == [new_record])
