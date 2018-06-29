@@ -63,7 +63,7 @@ class Keybind_detector (threading.Thread):
 		
 	def check_for_keybinds(self):
 		if self.keybind_list.has(self.active_keys):
-			keybind = self.keybind_list.lookup(self.active_keys)
-			if Keybind_book.is_keybinding(keybind):
-				pass
-			self.callback(keybind)
+			keybindings = self.keybind_list.lookup(self.active_keys)
+			for keybind in keybindings:
+				if Keybind_book.is_keybinding(keybind):
+					self.callback(keybind)
